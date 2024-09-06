@@ -109,6 +109,14 @@ const Dashboard = () => {
         .get<{ data: candlestick[] }>("http://127.0.0.1:8000/api/candle/")
         .then((res) => {
           console.log(res.data);
+          const candleArr: FinancialDataPoint[] = res.data.data.map((item) => ({
+            x: new Date(item.x).getTime(),
+            o: item.open,
+            h: item.high,
+            l: item.low,
+            c: item.close,
+            // cts: new Date(item.x).getTime(),
+          }));
 
           // const candleArray = res.data;
           // console.log(candleArray);
@@ -116,14 +124,7 @@ const Dashboard = () => {
             datasets: [
               {
                 label: "Candlestick Chart",
-                data: res.data.data.map((item) => ({
-                  x: new Date(item.x).getTime(),
-                  o: item.open,
-                  h: item.high,
-                  l: item.low,
-                  c: item.close,
-                  // cts: new Date(item.x).getTime(),
-                })),
+                data: candleArr,
                 borderColor: "rgba(66,66,66)",
               },
             ],
