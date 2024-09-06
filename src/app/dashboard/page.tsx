@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 import { Bar, Line, Pie, Chart as ReactChartJs } from "react-chartjs-2";
 import {
   ChartData,
@@ -16,7 +17,6 @@ import {
   FinancialDataPoint,
   TimeScale,
 } from "chart.js";
-import Link from "next/link";
 import {
   CandlestickController,
   CandlestickElement,
@@ -62,70 +62,76 @@ const Dashboard = () => {
   > | null>(null);
 
   useEffect(() => {
-    axios.get<ChartResponse>("http://127.0.0.1:8000/api/line/").then((res) => {
-      //   console.log(res.data);
-      setLineData({
-        labels: res.data.labels,
-        datasets: [
-          {
-            label: "Line Chart",
-            data: res.data.data,
-            borderColor: "rgb(75, 192, 192)",
-          },
-        ],
-      });
-    });
+    try {
+      axios
+        .get<ChartResponse>("http://127.0.0.1:8000/api/line/")
+        .then((res) => {
+          //   console.log(res.data);
+          setLineData({
+            labels: res.data.labels,
+            datasets: [
+              {
+                label: "Line Chart",
+                data: res.data.data,
+                borderColor: "rgb(75, 192, 192)",
+              },
+            ],
+          });
+        });
 
-    axios.get<ChartResponse>("http://127.0.0.1:8000/api/bar/").then((res) => {
-      setBarData({
-        labels: res.data.labels,
-        datasets: [
-          {
-            label: "Bar Chart",
-            data: res.data.data,
-            backgroundColor: ["rgba(34, 151, 153)", "rgba(66,66,66)"],
-          },
-        ],
-      });
-    });
-
-    axios.get<ChartResponse>("http://127.0.0.1:8000/api/pie/").then((res) => {
-      setPieData({
-        labels: res.data.labels,
-        datasets: [
-          {
-            label: "Pie Chart",
-            data: res.data.data,
-            backgroundColor: ["rgb(30, 32, 30)", "rgba(34, 151, 153)"],
-          },
-        ],
-      });
-    });
-
-    axios
-      .get<{ data: candlestick[] }>("http://127.0.0.1:8000/api/candle/")
-      .then((res) => {
-        console.log(res.data);
-
-        // const candleArray = res.data;
-        // console.log(candleArray);
-        setCandleData({
+      axios.get<ChartResponse>("http://127.0.0.1:8000/api/bar/").then((res) => {
+        setBarData({
+          labels: res.data.labels,
           datasets: [
             {
-              label: "Candlestick Chart",
-              data: res.data.data.map((item) => ({
-                x: new Date(item.x).getTime(),
-                o: item.open,
-                h: item.high,
-                l: item.low,
-                c: item.close,
-                // cts: new Date(item.x).getTime(),
-              })),
-              borderColor: "rgba(66,66,66)",
+              label: "Bar Chart",
+              data: res.data.data,
+              backgroundColor: ["rgba(34, 151, 153)", "rgba(66,66,66)"],
             },
           ],
         });
       });
+
+      axios.get<ChartResponse>("http://127.0.0.1:8000/api/pie/").then((res) => {
+        setPieData({
+          labels: res.data.labels,
+          datasets: [
+            {
+              label: "Pie Chart",
+              data: res.data.data,
+              backgroundColor: ["rgb(30, 32, 30)", "rgba(34, 151, 153)"],
+            },
+          ],
+        });
+      });
+
+      axios
+        .get<{ data: candlestick[] }>("http://127.0.0.1:8000/api/candle/")
+        .then((res) => {
+          console.log(res.data);
+
+          // const candleArray = res.data;
+          // console.log(candleArray);
+          setCandleData({
+            datasets: [
+              {
+                label: "Candlestick Chart",
+                data: res.data.data.map((item) => ({
+                  x: new Date(item.x).getTime(),
+                  o: item.open,
+                  h: item.high,
+                  l: item.low,
+                  c: item.close,
+                  // cts: new Date(item.x).getTime(),
+                })),
+                borderColor: "rgba(66,66,66)",
+              },
+            ],
+          });
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   return (
