@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Bar, Line, Pie } from "react-chartjs-2";
 import {
   ChartData,
   Chart as ChartJS,
@@ -14,8 +14,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import Link from "next/link";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,8 +27,8 @@ ChartJS.register(
   Legend
 );
 
-// Define types for the chart data structure
-interface ChartResponseData {
+// chart response type defining
+interface ChartResponse {
   labels: string[];
   data: number[];
 }
@@ -40,26 +40,22 @@ const Dashboard = () => {
   // Add candlestick data if needed
 
   useEffect(() => {
-    // Fetch line chart data
-    axios
-      .get<ChartResponseData>("http://127.0.0.1:8000/api/line/")
-      .then((response) => {
-        setLineData({
-          labels: response.data.labels,
-          datasets: [
-            {
-              label: "Line Chart",
-              data: response.data.data,
-              borderColor: "rgba(75,192,192,1)",
-              fill: false,
-            },
-          ],
-        });
+    axios.get<ChartResponse>("http://127.0.0.1:8000/api/line/").then((res) => {
+      console.log(res.data);
+      setLineData({
+        labels: res.data.labels,
+        datasets: [
+          {
+            label: "Line Chart",
+            data: res.data.data,
+            borderColor: "rgb(75, 192, 192)",
+          },
+        ],
       });
+    });
 
-    // Fetch bar chart data
     axios
-      .get<ChartResponseData>("http://127.0.0.1:8000/api/bar/")
+      .get<ChartResponse>("http://127.0.0.1:8000/api/bar/")
       .then((response) => {
         setBarData({
           labels: response.data.labels,
@@ -76,9 +72,8 @@ const Dashboard = () => {
         });
       });
 
-    // Fetch pie chart data
     axios
-      .get<ChartResponseData>("http://127.0.0.1:8000/api/pie/")
+      .get<ChartResponse>("http://127.0.0.1:8000/api/pie/")
       .then((response) => {
         setPieData({
           labels: response.data.labels,
@@ -95,14 +90,20 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="flex justify-between">
-        <div className="w-1/3">
-          <h1>Dashboard</h1>
+      <div className="block md:flex justify-between">
+        <div className="w-full md:w-1/4 bg-gray-900 md:h-screen p-3">
+          <h1 className="text-xl md:text-3xl my-3 font-bold">Dashboard</h1>
+          <Link href="/">
+            <button className="w-full text-sm bg-gray-600 px-2 md:px-3 font-bold py-1 md:py-2 rounded-lg">
+              Home
+            </button>
+          </Link>
         </div>
         <div className="w-full ">
-          <div className="flex justify-between">
-            <div className="w-1/2">
-              {/* Line Chart */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 p-2 md:p-6 md:h-screen">
+            {/* Line Chart */}
+
+            <div className="">
               {lineData && (
                 <Line
                   data={lineData}
@@ -116,8 +117,10 @@ const Dashboard = () => {
                 />
               )}
             </div>
-            <div className="w-1/2">
-              {/* Bar Chart */}
+
+            {/* Bar Chart */}
+
+            <div className="">
               {barData && (
                 <Bar
                   data={barData}
@@ -131,10 +134,10 @@ const Dashboard = () => {
                 />
               )}
             </div>
-          </div>
-          <div className="flex justify-between">
-            <div>
-              {/* Pie Chart */}
+
+            {/* Pie Chart */}
+
+            <div className="flex justify-center">
               {pieData && (
                 <Pie
                   data={pieData}
@@ -144,7 +147,6 @@ const Dashboard = () => {
                 />
               )}
             </div>
-            <div></div>
           </div>
         </div>
       </div>
